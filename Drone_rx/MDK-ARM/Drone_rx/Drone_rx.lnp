@@ -1,0 +1,25 @@
+--cpu Cortex-M3
+"drone_rx\startup_stm32f103xb.o"
+"drone_rx\main.o"
+"drone_rx\stm32f1xx_it.o"
+"drone_rx\stm32f1xx_hal_msp.o"
+"drone_rx\stm32f1xx_hal_gpio_ex.o"
+"drone_rx\stm32f1xx_hal_spi.o"
+"drone_rx\stm32f1xx_hal.o"
+"drone_rx\stm32f1xx_hal_rcc.o"
+"drone_rx\stm32f1xx_hal_rcc_ex.o"
+"drone_rx\stm32f1xx_hal_gpio.o"
+"drone_rx\stm32f1xx_hal_dma.o"
+"drone_rx\stm32f1xx_hal_cortex.o"
+"drone_rx\stm32f1xx_hal_pwr.o"
+"drone_rx\stm32f1xx_hal_flash.o"
+"drone_rx\stm32f1xx_hal_flash_ex.o"
+"drone_rx\stm32f1xx_hal_exti.o"
+"drone_rx\stm32f1xx_hal_tim.o"
+"drone_rx\stm32f1xx_hal_tim_ex.o"
+"drone_rx\system_stm32f1xx.o"
+"drone_rx\my_nrf24.o"
+--strict --scatter "Drone_rx\Drone_rx.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "Drone_rx.map" -o Drone_rx\Drone_rx.axf
