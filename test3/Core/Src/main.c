@@ -86,30 +86,6 @@ float KalmanAngleRoll  =0,  Kalman_ERR_AngleRoll  = 2*2 ; // gia su sai so theo 
 float KalmanAnglePitch =0,  Kalman_ERR_AnglePitch = 2*2 ;
 float Kalman_ouput[2] = {0,0}; // angle prediction, uncertainly of the predictiobn 
 
-// PID va
-//float PIDReturn[9]= {0 };
-//float DesiredRateRoll, DesiredRatePitch,
-//DesiredRateYaw;
-//float ErrorRateRoll, ErrorRatePitch, ErrorRateYaw;
-//float InputRoll, InputThrottle, InputPitch, InputYaw;
-//float PrevErrorRateRoll, PrevErrorRatePitch,
-//PrevErrorRateYaw;
-//float PrevItermRateRoll, PrevItermRatePitch,
-//PrevItermRateYaw;
-
-
-//float PRateRoll=2 ; 
-//float PRatePitch =2;
-//float PRateYaw=2;
-
-//float IRateRoll=0.05 ;
-//float IRatePitch=0.05;
-//float IRateYaw=12;
-
-//float DRateRoll=0.03 ; 
-//float DRatePitch=0.03;
-//float DRateYaw=0;
-
 											//PID
 
 float pid_set_points_roll,pid_set_points_pitch,pid_set_points_yaw; // roll, pitch, yaw
@@ -119,11 +95,23 @@ float errors[3]; // Measured errors (compared to instructions) : [roll, pitch, y
 float delta_err[3] = { 0, 0, 0 }; // Error deltas in that order   : roll, pitch, yaw
 float error_sum[3] = { 0, 0, 0 }; // Error sums (used for integral component) : [roll, pitch, yaw]
 float previous_error[3] = { 0, 0, 0 }; // Last errors (used for derivative component) : [roll, pitch, yaw]
+float angular_motions[3] = { 0, 0, 0 };
 // PID coefficients
 
-float Kp[3] = { 1.5, 1.5, 2 };
+
+//float Kp[3] = { 1, 1, 0.5};
+//float Ki[3] = {0.03, 0.03, 0.02}; 	 	// I: roll, pitch, yaw
+//float Kd[3] = { 0.01, 0.01, 0 };         // D: roll, pitch, yaw
+
+//float Kp[3] = { 0.9, 0.9, 1};
+//float Ki[3] = {0.03, 0.03, 0.02}; 	 	// I: roll, pitch, yaw
+//float Kd[3] = { 0.02, 0.02, 0.02 };         // D: roll, pitch, yaw
+
+
+float Kp[3] = { 1, 1, 1};
 float Ki[3] = {0.03, 0.03, 0.02}; 	 	// I: roll, pitch, yaw
 float Kd[3] = { 0.01, 0.01, 0 };         // D: roll, pitch, yaw
+
 
 float pid_roll = 0;
 float pid_pitch = 0;
@@ -310,9 +298,9 @@ void Calibrate()
       gyro_cal[2] /= 2000;
     
 		// calibrate value for acc
-      acc_cal[0] = -80;
-      acc_cal[1] = 0;
-      acc_cal[2] = -580;
+      acc_cal[0] = -50;
+      acc_cal[1] = 50;
+      acc_cal[2] = -560;
   }
 
   void Read_mpu_all()
@@ -365,26 +353,7 @@ void Calibrate()
     // RateYaw = 0.7 * RateYaw + ((float) gyro_raw[2]  /65.5) * 0.3;
   }
 
-//  void pid_equation(float Error, float P , float I, float D,float PrevError, float PrevIterm) 
-//  {
 
-//      float Pterm = P*Error;  // Kp * error
-
-//      float Iterm = PrevIterm + I*(Error+PrevError)* 0.004/2;  // Ts = 0.004= 4ms // giá trị của Ki bằng sai số hieenjn tại cộng với trước chia 2
-
-//      if (Iterm > 400) Iterm=400;  // limit the Iterm
-//      else if (Iterm <-400) Iterm=-400;
-
-//      float Dterm= D*(Error-PrevError)/0.004;  // gia tri cua bộ D // khau  vi phan
-//      float PIDOutput= Pterm+Iterm+Dterm;
-//      if (PIDOutput>400) PIDOutput=400;
-//      else if (PIDOutput <-400)
-//       PIDOutput=-400;
-
-//      PIDReturn[0]=PIDOutput;
-//      PIDReturn[1]=Error;
-//      PIDReturn[2]=Iterm;
-//  }
 void reset_pid(void) 
   {
       errors[0] = 0;
@@ -403,36 +372,6 @@ void reset_pid(void)
 			pid_pitch = 0;
 			pid_yaw = 0;
   }
-
-//  void caculate_pid()
-//  {
-//      DesiredRateRoll=0.15*(diff1-1500); // limit the roll rate in 75"/s  500 * 0.15 = 75
-//      DesiredRatePitch=0.15*(diff2-1500); // RatePitch: tốc dộ goc trục pitch mong muốn
-//      InputThrottle=diff3;
-//      DesiredRateYaw=0.15*(diff4-1500);
-
-//      ErrorRateRoll=DesiredRateRoll-RateRoll; // sai số = toc do goc mong muon - toc do goc do dac
-//      ErrorRatePitch=DesiredRatePitch-RatePitch;
-//      ErrorRateYaw=DesiredRateYaw-RateYaw;
-
-//      pid_equation(ErrorRateRoll, PRateRoll, IRateRoll, DRateRoll, PrevErrorRateRoll,PrevItermRateRoll);
-//      InputRoll=PIDReturn[0];
-//      PrevErrorRateRoll=PIDReturn[1];
-//      PrevItermRateRoll=PIDReturn[2];
-
-//      pid_equation(ErrorRatePitch, PRatePitch, IRatePitch, DRatePitch, PrevErrorRatePitch, PrevItermRatePitch);
-//      InputPitch=PIDReturn[0];
-//      PrevErrorRatePitch=PIDReturn[1];
-//      PrevItermRatePitch=PIDReturn[2];
-
-//      pid_equation(ErrorRateYaw, PRateYaw, IRateYaw, DRateYaw, PrevErrorRateYaw,PrevItermRateYaw);
-//      InputYaw=PIDReturn[0];
-//      PrevErrorRateYaw=PIDReturn[1];
-//      PrevItermRateYaw=PIDReturn[2];
-
-//      if (InputThrottle > 2000) InputThrottle = 2000;
-
-//}
 
 /* USER CODE END 0 */
 
@@ -511,6 +450,12 @@ int main(void)
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 1000); //rl
 
 	HAL_Delay(300);
+	//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+	for (int i = 0; i < 20; i++) {
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+		HAL_Delay(100);
+	}
+	
 	
 	//prevtime = HAL_GetTick();
   /* USER CODE END 2 */
@@ -533,6 +478,10 @@ int main(void)
 		capture4 = diff4;
 		
     Read_mpu_all();
+		angular_motions[roll] = 0.7 * angular_motions[roll]+ ((float) gyro_raw[0] * 0.3 / 65.5); //Gyro pid input is deg/sec.
+		angular_motions[pitch] = 0.7 * angular_motions[pitch]+ ((float) gyro_raw[1] * 0.3 / 65.5);
+		angular_motions[yaw] = 0.7 * angular_motions[yaw]+ ((float) gyro_raw[2] * 0.3 / 65.5);
+		
     Kalman(KalmanAngleRoll,Kalman_ERR_AngleRoll, RateRoll, angle_roll);
     KalmanAngleRoll = Kalman_ouput[0];
     Kalman_ERR_AngleRoll = Kalman_ouput[1];
@@ -584,9 +533,9 @@ int main(void)
 		}
 
 		// Calculate current errors
-		errors[roll] = RateRoll - pid_set_points_roll;
-		errors[pitch] = RatePitch - pid_set_points_pitch;
-		errors[yaw] = RateYaw - pid_set_points_yaw;
+		errors[roll] = angular_motions[roll] - pid_set_points_roll;
+		errors[pitch] = angular_motions[pitch] - pid_set_points_pitch;
+		errors[yaw] = angular_motions[yaw] - pid_set_points_yaw;
 
 		// Calculate sum of errors : Integral coefficients
 		error_sum[roll]  += errors[roll];
@@ -619,17 +568,17 @@ int main(void)
 
 		throttle = capture3;
 
-		if (throttle > 1050) {
+		
 			// PID = e.Kp + ∫e.Ki.t + Δe.Kd/t
 			pid_roll = (errors[roll] * Kp[roll])
-					+ (error_sum[roll] * Ki[roll]) * 0.004
-					+ (delta_err[roll] * Kd[roll]) / 0.004;
+					+ (error_sum[roll] * Ki[roll]) * 0.01
+					+ (delta_err[roll] * Kd[roll]) / 0.01;
 			pid_pitch = (errors[pitch] * Kp[pitch])
-					+ (error_sum[pitch] * Ki[pitch]) * 0.004
-					+ (delta_err[pitch] * Kd[pitch]) / 0.004;
+					+ (error_sum[pitch] * Ki[pitch]) * 0.01
+					+ (delta_err[pitch] * Kd[pitch]) / 0.01;
 			pid_yaw = (errors[yaw] * Kp[yaw])
-					+ (error_sum[yaw] * Ki[yaw]) * 0.004
-					+ (delta_err[yaw] * Kd[yaw]) / 0.004;
+					+ (error_sum[yaw] * Ki[yaw]) * 0.01
+					+ (delta_err[yaw] * Kd[yaw]) / 0.01;
 
 			if (pid_roll > pid_max[roll])
 				pid_roll = pid_max[roll];
@@ -643,16 +592,16 @@ int main(void)
 				pid_yaw = pid_max[yaw];
 			if (pid_yaw < (-pid_max[yaw]))
 				pid_yaw = -pid_max[yaw];
-		}
+		
     if (active == 2) 
     {
 			if (throttle > 1800)
 				throttle = 1800;
 
-			esc1 = throttle + pid_roll + pid_pitch + pid_yaw; //Calculate the pulse for esc 1 (front-right - CCW).
+			esc1 = throttle + pid_roll + pid_pitch + pid_yaw ; //Calculate the pulse for esc 1 (front-right - CCW).
 			esc2 = throttle - pid_roll + pid_pitch - pid_yaw; //Calculate the pulse for esc 2 (front-left - CW).
-			esc3 = throttle - pid_roll - pid_pitch + pid_yaw; //Calculate the pulse for esc 3 (rear-left - CCW).
-			esc4 = throttle + pid_roll - pid_pitch - pid_yaw; //Calculate the pulse for esc 4 (rear-right - CW).
+			esc3 = throttle - pid_roll- pid_pitch + pid_yaw ; //Calculate the pulse for esc 3 (rear-left - CCW).
+			esc4 = throttle + pid_roll - pid_pitch - pid_yaw ; //Calculate the pulse for esc 4 (rear-right - CW).
 
 			if (esc1 < 1100)
 				esc1 = 1100;  //Keep the motors running.
@@ -687,13 +636,15 @@ int main(void)
 			
 		myTxData[0] =KalmanAngleRoll;
 		myTxData[1] =KalmanAnglePitch;
-		myTxData[2] =esc1;
-		myTxData[3] =esc2;
+		//myTxData[2] =esc1;
+		//myTxData[3] =esc2;
+		//myTxData[4] =esc3;
+		//myTxData[5] =esc4;
 	
 		NRF24_write(myTxData, 32);
 
 
-	while ((HAL_GetTick() - prevtime) * 1000 < 4000);
+	while ((HAL_GetTick() - prevtime) * 1000 < 10000);
 	prevtime = HAL_GetTick();
 
   }
