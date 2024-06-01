@@ -8,3 +8,5 @@ graduation project
    +Hardware: STM32, F450 frame, esc 40A, bldc motor 1400Kv, mpu6050, nrf24l01, Lipo 3s 2200 mAh, Mc6c Tx and rx.
    
    +Software: STM32Cubemx, STMStudio, LibreCad, Visual Studio Code, KeilC.
+
+   +demo: https://youtu.be/_2xURL7-DWQ?si=0GGSzdXRDkm73QRR
